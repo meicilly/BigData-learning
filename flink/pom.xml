@@ -104,7 +104,7 @@
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>src/test/java</testSourceDirectory>
+<!--        <testSourceDirectory>src/test/java</testSourceDirectory>-->
         <plugins>
             <!-- 编译插件 -->
             <plugin>
