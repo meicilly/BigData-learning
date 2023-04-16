@@ -10,9 +10,9 @@ public class KafkaProducerClient {
         // TODO: 2023/4/11 构建kafka生产者连接对象
         Properties props = new Properties();
         // TODO: 2023/4/11 指定服务端的地址
-        String KAFKA_HOST = "192.168.88.11:9092,192.168.88.12:9092,192.168.88.13:9092";
-        //props.put("bootstrap.servers","192.168.233.16:9092,192.168.233.17:9092,192.168.233.18:9092");
-        props.put("bootstrap.servers",KAFKA_HOST);
+        //String KAFKA_HOST = "192.168.88.11:9092,192.168.88.12:9092,192.168.88.13:9092";
+        props.put("bootstrap.servers","192.168.233.16:9092,192.168.233.17:9092,192.168.233.18:9092");
+        //props.put("bootstrap.servers",KAFKA_HOST);
         // TODO: 2023/4/11 ack机制 + 重试机制
         /**
          * ack：数据传输的确认码 用于定义生产者如何将数据写入kafka
