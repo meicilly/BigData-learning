@@ -12,6 +12,7 @@
         <module>Data structure and algorithm</module>
         <module>flink</module>
         <module>kafka</module>
+        <module>redis</module>
     </modules>
 
     <properties>

@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="flink" />
         <module name="suanfa" />
+        <module name="redis" />
         <module name="kafka" />
       </profile>
     </annotationProcessing>
