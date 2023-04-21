@@ -36,7 +36,7 @@ public class ConnectorRedisSinkDemo {
                             out.collect(Tuple2.of(word, 1));
                         }
                     }
-                }).keyBy(tuple -> tuple.f0).sum(0);
+                }).keyBy(tuple -> tuple.f0).sum("f1");
 
         // 4. 数据终端-sink
         FlinkJedisPoolConfig config = new FlinkJedisPoolConfig.Builder()
