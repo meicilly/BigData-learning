@@ -13,6 +13,7 @@
         <module>flink</module>
         <module>kafka</module>
         <module>redis</module>
+        <module>netty</module>
     </modules>
 
     <properties>

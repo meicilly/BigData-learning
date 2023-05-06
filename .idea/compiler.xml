@@ -11,7 +11,11 @@
         <module name="suanfa" />
         <module name="redis" />
         <module name="kafka" />
+        <module name="netty" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="untitled" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
