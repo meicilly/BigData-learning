@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util
+       https://www.springframework.org/schema/util/spring-util.xsd"
+>
+       <!--配置bean-->
+       <!--id属性：设置bean的唯一标识
+           class属性： 设置类的全类名 IOC容器通过反射创建对象-->
+       <bean id="book1" class="com.meicilly.core.Book">
+              <property name="id" value="1"></property>
+              <property name="title" value="三国演义"></property>
+              <property name="author" value="罗贯中"></property>
+              <property name="price" value="66.66"></property>
+              <property name="sales" value="100"></property>
+       </bean>
+<!--       指定value，自动适配合适的构造器-->
+       <bean id="book2" class="com.meicilly.core.Book">
+              <constructor-arg  value="2"></constructor-arg>
+              <constructor-arg  value="水浒传"></constructor-arg>
+              <constructor-arg  value="施耐庵"></constructor-arg>
+              <constructor-arg  value="88.88"></constructor-arg>
+              <constructor-arg  value="100"></constructor-arg>
+       </bean>
+<!--指定所有的属性-->
+       <bean id="book3" class="com.meicilly.core.Book">
+              <constructor-arg name="id" value="2"></constructor-arg>
+              <constructor-arg name="title"  value="水浒传"></constructor-arg>
+              <constructor-arg index="2" value="施耐庵"></constructor-arg>
+              <constructor-arg index="3" value="88.88"></constructor-arg>
+              <constructor-arg type="java.lang.Integer" value="100"></constructor-arg>
+       </bean>
+
+       <bean id="book4" class="com.meicilly.core.Book">
+              <property name="id" value="4"></property>
+              <property name="title">
+                     <value><![CDATA[<<西游记>>]]></value>
+              </property>
+              <property name="author"  value="施耐庵"></property>
+              <property name="price" value="88.88"></property>
+              <property name="sales">
+                     <null></null>
+              </property>
+       </bean>
+
+<!--       使用p名称空间-->
+       <!--通过p名称空间配置bean-->
+              <bean id="book5" class="com.meicilly.core.Book"
+                    p:id="5" p:title="解忧杂货店"
+                    p:author="藤野圭吾"
+                    p:price="33.00"
+                    p:sales="100">
+              </bean>
+      <!--引用外部已声明的bean-->
+       <bean id="cartItem" class="com.meicilly.core.cartItem">
+       <!--引用外部的bean-->
+              <property name="book" ref="book1"></property>
+              <property name="count" value="10"></property>
+              <property name="amount" value="100"></property>
+       </bean>
+
+      <!--使用内部bean-->
+       <bean id="cartItem2" class="com.meicilly.core.cartItem">
+      <!--配置内部bean-->
+              <property name="book">
+                     <bean class="com.meicilly.core.Book">
+                            <property name="id" value="6"></property>
+                            <property name="title" value="三体"></property>
+                            <property name="author" value="刘慈欣"></property>
+                            <property name="price" value="22.00"></property>
+                            <property name="sales" value="100"></property>
+                     </bean>
+              </property>
+       </bean>
+      <!--级联属性赋值-->
+       <bean id="cartItem3" class="com.meicilly.core.cartItem">
+              <property name="book" ref="book1"></property>
+              <!--通过给级联属性赋值将book1中的title修改为新三国-->
+              <property name="book.title" value="新三国"></property>
+       </bean>
+       <!--集合属性配置-->
+       <bean id="bookShop" class="com.meicilly.core.bookShop">
+              <property name="books">
+                     <list>
+                            <ref bean="book1"></ref>
+                            <ref bean="book2"></ref>
+                            <ref bean="book3"></ref>
+                     </list>
+              </property>
+              <property name="users">
+                     <map>
+                            <entry key="user1" value="张三"></entry>
+                            <entry key="user2" value="李四"></entry>
+                            <entry key="user3" value="王五"></entry>
+                     </map>
+              </property>
+       </bean>
+       <!--如果只能将集合对象配置在某个bean内部，则这个集合的配置将不能被重用。我们需要将集合bean的配置拿到外面，供其他bean引用。
+	配置集合类型的bean需要引入util名称空间。-->
+       <util:list id="listBean">
+              <bean class="com.meicilly.core.Book">
+                     <property name="id" value="1"></property>
+                     <property name="title" value="大秦帝国之裂变"></property>
+                     <property name="author" value="孙皓晖"></property>
+              </bean>
+              <bean class="com.meicilly.core.Book">
+                     <property name="id" value="1"></property>
+                     <property name="title" value="大秦帝国之裂变"></property>
+                     <property name="author" value="孙皓晖"></property>
+              </bean>
+              <bean class="com.meicilly.core.Book">
+                     <property name="id" value="1"></property>
+                     <property name="title" value="大秦帝国之裂变"></property>
+                     <property name="author" value="孙皓晖"></property>
+              </bean>
+       </util:list>
+       <!--自动装备-->
+       <bean id="cartItem4" class="com.meicilly.core.cartItem" autowire="byName"></bean>
+       <!--FactoryBean-->
+       <bean id="myFactoryBean" class="com.meicilly.core.MyFactoryBean"></bean>
+       </beans>
+
+
+
+

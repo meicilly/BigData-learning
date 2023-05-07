@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="flink" />
+        <module name="spring" />
         <module name="suanfa" />
         <module name="redis" />
         <module name="kafka" />
