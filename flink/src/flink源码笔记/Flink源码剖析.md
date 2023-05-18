@@ -92,4 +92,39 @@ ExecutionGraph:JobManager 根据 JobGraph 生成 ExecutionGraph。ExecutionGraph
 物理执行图:JobManager 根据 ExecutionGraph 对 Job 进行调度后，在各个 TaskManager 上部署 Task 后形成的图，并不是一个具体的数据结构。
 ![抽象图](./img/程序抽象图.png)
 - 从JobGraph的图里可以看到,数据从上一个operator(JobVertex)流到下一个operator(JobVertex)的过程中,上游作为生产者提供了IntermediateDataSet,而下游作为消费者需要JobEdge。事实上,JobEdge是一个通信管道连接了上游生产的 dataset和下游的 JobVertex 节点。
+- 在JobGraph转换到ExecutionGraph的过程中,主要发生了以下转变:
+    + 加入了并行度的概念,称为真正可调度的图结构
+    + 生成了与JobVertex对应的ExecutionJobVertex,ExecutionVertex,与IntermediateDataSet对应的IntermediateResult和IntermediateResultPartition等,并行将通过这些类实现
+    + ExecutionGraph已经可以用于调度任务,可以看到,Flink根据该图生成了一一对应的Task。每个 Task 对应一个ExecutionGraph 的一个Execution。Task 用 InputGate、InputChannel 和 ResultPartition 对应了上面图中的 IntermediateResult和 ExecutionEdge。
 
+为什么要这么要设计这么四层的执行逻辑？它的意义是什么？
+```
+1.StreamGraph是对用户逻辑的映射
+2.JobGraph在StreamGraph基础上进行了一些优化,比如把一部分操作成chain以提高效率
+3.ExecutionGraph是为了调度存在的,加入了并行处理的概念
+4.物理执行结构,真正执行的是Task及其相关结构
+```
+##### StreamGraph
+StreamGraph:根据用户通过Stream API编写的代码生成的最初的图。Flink把每一个算子transform成一个对流的转换(比如SingleOutputStreamOperator,它就是一个DataStream的子类),并且注册到执行环境中,用于生成StreamGraph。
+它包含的主要抽象概念有:
+```
+1.StreamNode:用来代表operator的类,并具有所有相关的属性,如并发度、入边和出边等。
+2.StreamEdge：表示连接两个StreamNode的边。
+```
+##### JobGraph
+JobGraph:StreamGraph经过优化后生成了JobGraph,提交给JobManager的数据结构
+它包含的主要抽象概念有:
+```
+1.JobVertex:经过优化后负荷条件的多个StreamNode可能会chain在一起生成一个JobVertex，既一个JobVertex包含一个或多个operator,JobVertex的输入是JobEdge,输出是IntermediateDataSet
+2.IntermediateDataSet：表示JobVertex的输出，即经过operator处理产生的数据集。producer是JobVertex，consumer是JobEdge
+3.JobEgde:代表了job graph中的一条数据传输通道。source是IntermediateDataSet,target是JobVertex。既数据通过JobEdge由IntermediateDataSet传递给目标JobVertex。
+```
+##### ExecutionGraph
+ExecutionGraph：JobManager(JobMaster)根据JobGraph生成ExecutionGraph。ExecutionGraph是JobGraph的并行化版本,是调度层最核心的数据结构。
+它包含的主要抽象概念有:
+```
+1.ExecutionJobVertex：和JobGraph中的JobVertex一一对应，每一个ExecutionJobVertex都有和并发度一样多的ExecutionVertex。
+2.ExecutionVertex：表示ExecutionJobVertex的其中一个并发子任务，输入是ExecutionEdge，输出是IntermediateResultPartition。
+3.IntermediateResult:和JobGraph中的IntermediateDataSet一一对应。一个IntermediateResult包含多个IntermediateResultPartition，其个数等于operator的并发度
+4.IntermediateResultPartitoin：表示ExecutionVertex的一个输出分区，producer是ExecutionVertex，consumer是若干个ExcutionEdge
+```
