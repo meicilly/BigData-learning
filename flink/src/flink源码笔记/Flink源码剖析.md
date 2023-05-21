@@ -278,3 +278,8 @@ HeartbeatMonitor 的内部包装了一个 HeartbeatTarget 和一个 HeartbeatLis
 1、当心跳服务启动的时候，就会执行 resetHeartbeatTimeout() 方法开启一个延迟执行方法：心跳超时方法heartbeatListener.notifyHeartbeatTimeout(resourceID);
 2、每次接收到 HeartbeatTarget 的心跳的时候，更新 lastHeartbeat 属性，该属性用来保存最近一次心跳时间，然后重置该任务。重新计时。
 ```
+关于心跳：
+![关于心跳](./img/关于心跳.png)
+从HeartBeatListener的实现类就可以看出来：
+![HeartBeatListener实现类](./img/HeartBeatListener实现类.png)
+关于心跳的具体实现，Flink 封装了一个心跳服务：HeartbeatServices，请看它的结构：
