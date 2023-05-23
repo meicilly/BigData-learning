@@ -283,3 +283,77 @@ HeartbeatMonitor 的内部包装了一个 HeartbeatTarget 和一个 HeartbeatLis
 从HeartBeatListener的实现类就可以看出来：
 ![HeartBeatListener实现类](./img/HeartBeatListener实现类.png)
 关于心跳的具体实现，Flink 封装了一个心跳服务：HeartbeatServices，请看它的结构：
+```
+  public class HeartbeatServices {
+  // 心跳时间
+  protected final long heartbeatInterval;
+  // 超时时间
+  protected final long heartbeatTimeout;
+  // 共有构造方法
+  public HeartbeatServices(long heartbeatInterval, long heartbeatTimeout) {
+    this.heartbeatInterval = heartbeatInterval;
+    this.heartbeatTimeout = heartbeatTimeout;
+  }
+  // 创建心跳管理器
+  public <I, O> HeartbeatManager<I, O> createHeartbeatManager(....) {
+    return new HeartbeatManagerImpl<>(heartbeatTimeout, resourceId, heartbeatListener, mainThreadExecutor, log);
+  }
+  // 创建心跳发送器
+  public <I, O> HeartbeatManager<I, O> createHeartbeatManagerSender(){
+    return new HeartbeatManagerSenderImpl<>(heartbeatInterval, heartbeatTimeout, resourceId, heartbeatListener,
+...);
+  }
+}
+```
+HeartbeatManagerImpl和HeartbeatManager的结构
+```java
+public class HeartbeatManagerImpl<I, O> implements HeartbeatManager<I, O> {
+  private final HeartbeatListener<I, O> heartbeatListener;
+// 心跳目标对象集合
+private final ConcurrentHashMap<ResourceID, HeartbeatMonitor<O>> heartbeatTargets;
+  // 管理心跳目标对象
+  public void monitorTarget(ResourceID resourceID, HeartbeatTarget<O> heartbeatTarget) {
+    ;
+  }
+  // 接收心跳
+  public void receiveHeartbeat(ResourceID heartbeatOrigin, I heartbeatPayload) {
+    ;
+  }
+  // 发送心跳请求
+  public void requestHeartbeat(final ResourceID requestOrigin, I heartbeatPayload) {
+    ;
+  }
+  // 记录心跳
+  HeartbeatTarget<O> reportHeartbeat(ResourceID resourceID) {
+    ;
+  }
+}
+```
+```java
+public class HeartbeatManagerSenderImpl<I, O> extends HeartbeatManagerImpl<I, O> implements Runnable {
+// 构造方法
+HeartbeatManagerSenderImpl(.....) {
+super(heartbeatTimeout, ownResourceID, heartbeatListener, mainThreadExecutor, log, heartbeatMonitorFactory);
+this.heartbeatPeriod = heartbeatPeriod;
+// 启动延迟调度任务
+mainThreadExecutor.schedule(this, 0L, TimeUnit.MILLISECONDS);
+}
+public void run() {
+// 遍历每个心跳目标对象
+for(HeartbeatMonitor<O> heartbeatMonitor : getHeartbeatTargets().values()) {
+// 发送心跳请求
+requestHeartbeat(heartbeatMonitor);
+}
+// 重新启动延迟调度任务
+getMainThreadExecutor().schedule(this, heartbeatPeriod, TimeUnit.MILLISECONDS);
+}
+}
+```
+关于Flink的心跳总结：
+```
+1.Flink的JobManager和TaskManager和JobManager之间都有心跳
+2.JobManager向TaskManager发送心跳请求。TaskManager接受到心跳的时候记录心跳时间
+3.JobManager向JobMaster发送心跳请求。JobMaster接收到心跳的时候记录心跳时间
+4.JobMaster向TaskManager发送心跳请求。TaskManager接收到心跳的时候，也记录心跳的时间
+5.Flink的心跳超时延迟调度任务一直在运行，只有当有心跳产生的时候，会重置该延迟调度任务
+```
