@@ -15,6 +15,9 @@
         <module>redis</module>
         <module>netty</module>
         <module>spring</module>
+        <module>spring-mvc</module>
+        <module>servlet</module>
+        <module>flink_demo</module>
     </modules>
 
     <properties>
