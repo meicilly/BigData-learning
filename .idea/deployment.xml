@@ -5,6 +5,7 @@
       <paths name="hd01">
         <serverdata>
           <mappings>
+            <mapping local="$PROJECT_DIR$/kafka" web="/" />
             <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
