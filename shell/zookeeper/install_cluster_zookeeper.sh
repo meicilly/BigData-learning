@@ -1,12 +1,12 @@
 #!/bin/bash
 #需要部署节点的ip地址
-IP_ADDR="192.168.88.11 192.168.88.12 192.168.88.13"
+IP_ADDR="192.168.233.16 192.168.233.17 192.168.233.18"
 #当前目录 这个目录必须保证有
 CUR_PATH=/opt/meicilly
 #zookeeper安装的路径
 ZK_PATH=${CUR_PATH}/software
 #zookeeper的版本
-ZK_VERSION=apache-zookeeper-3.6.3-bin
+ZK_VERSION=apache-zookeeper-3.5.7-bin
 #ZK安装包的存储的路径
 ZK_PAK=${ZK_PATH}/${ZK_VERSION}.tar.gz
 #myid里的值
