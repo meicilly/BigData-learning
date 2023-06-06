@@ -3,9 +3,23 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="f19dc1c0-2bda-4e2b-971e-19d473ed0675" name="hd01" url="http://192.168.233.16">
-        <fileTransfer rootFolder="/opt" accessType="SFTP" host="192.168.233.16" port="22" sshConfigId="5f73b3ee-5fc2-4c64-8893-4c1cbf187d0e" sshConfig="root@192.168.233.16:22 password">
+        <fileTransfer rootFolder="/opt" accessType="SFTP" host="192.168.88.11" port="22" sshConfigId="5f73b3ee-5fc2-4c64-8893-4c1cbf187d0e" sshConfig="root@192.168.88.11:22 password">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="5f97c5aa-022c-47bb-88dd-fabf93220543" name="HD" url="http://192.168.88.11">
+        <fileTransfer rootFolder="/opt" accessType="SFTP" host="192.168.88.11" port="22" sshConfigId="5f73b3ee-5fc2-4c64-8893-4c1cbf187d0e" sshConfig="root@192.168.88.11:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseRsync="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="ffdb86e6-5915-46a4-b881-13e2f9b5d7d9" name="hh" url="http://192.168.88.11">
+        <fileTransfer rootFolder="/opt" accessType="SFTP" host="192.168.88.11" port="22" sshConfigId="5f73b3ee-5fc2-4c64-8893-4c1cbf187d0e" sshConfig="root@192.168.88.11:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseRsync="true" />
           </advancedOptions>
         </fileTransfer>
       </webServer>
