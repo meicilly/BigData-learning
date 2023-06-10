@@ -19,6 +19,7 @@
         <module>flink_demo</module>
         <module>mybatis</module>
         <module>springmvc</module>
+        <module>mapreduce</module>
     </modules>
 
     <properties>
