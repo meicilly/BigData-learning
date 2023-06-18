@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="flink" />
         <module name="spring" />
+        <module name="hive" />
         <module name="suanfa" />
         <module name="mapreduce" />
         <module name="servlet" />

@@ -80,3 +80,39 @@ client.submitApplication(appContext);
 rmClient.submitApplication(request);
 ```
 最终：ResourceManager 组件中的 ClientRMService 来执行 submitApplication() 的 RPC 服务处理
+### MapReduce逻辑切片
+入口方法：JobSubmiter.writeSplits(job, submitJobDir);
+内部真正执行切片的是：FileInputFormat.getSplits(job);
+核心逻辑为：
+```
+// 存储逻辑切片结果
+List<InputSplit> splits = new ArrayList<InputSplit>();
+// 遍历每个文件
+for(FileStatus file : files) {
+long length = file.getLen();
+if(length != 0) {
+// 如果文件可切分，则执行逻辑切片
+if(isSplitable(job, path)) {
+// 计算逻辑切片大小
+long splitSize = computeSplitSize(blockSize, minSize, maxSize);
+// 只要剩下的该文件的大小大于 splitSize 的 1.1 倍 就执行逻辑切片
+while(((double) bytesRemaining) / splitSize > SPLIT_SLOP) {
+// 切片
+splits.add(makeSplit(file, start, length, hosts, inMemoryHosts);
+// 管理文件剩余大小
+bytesRemaining -= splitSize;
+}
+// 如果剩余的数据大小 不等于0， 并且小于 splitSize 的 1.1 倍，则划分成一个逻辑切片
+if(bytesRemaining != 0) {
+splits.add(makeSplit(file, start, length, hosts, inMemoryHosts);
+}
+// 否则直接形成一个逻辑切片
+}else{
+splits.add(makeSplit(file, start, length, hosts, inMemoryHosts);
+}
+}else{
+// 什么也没做
+}
+}
+return splits;
+```
