@@ -284,7 +284,7 @@ FROM table_reference       -- 从什么表查
 #### 基本查询
 ```sql
 -- 创建部门表
-create table if not exists dept(
+create table if not exists dept1(
     deptno int comment '部门编号',
     dname string comment '部门名称',
     loc int comment '部门位置'
@@ -301,7 +301,7 @@ create table if not exists emp(
 )
 row format delimited fields terminated by "\t";
 
-load data local inpath "/opt/dept.txt" into table dept;
+load data local inpath "/opt/dept.txt" into table dept1;
 load data local inpath "/opt/emp.txt" into table emp;
 ```
 #### 全表和特定列查询
@@ -365,5 +365,368 @@ select deptno,avg(sal) avg_sal from emp group by deptno having avg_sal > 2000;
 ```
 #### Join语句
 ```sql
-
+-- 根据员工表和部门表中的部门编号相等，查询员工编号、员工名称和部门名称
+select e.empno,e.ename,d.dname from emp e join dept d on e.deptno = d.deptno;
+-- 合并员工表和部门表
+select e.*,d.* from emp e join dept d on e.deptno = d.deptno;
 ```
+##### 内连接
+```sql
+-- 内连接：只有进行连接的两个表中都存在与连接条件相匹配的数据才会被保留下来。
+select e.empno,e.ename,d.dname from emp e inner join dept1 d on e.deptno = d.deptno;
+-- 左外连接：join操作符左边表中符合where子句的所有记录将会被返回。
+select e.empno,e.ename,d.dname from emp e left join dept1 d on e.deptno = d.deptno;
+-- 左外连接：join操作符左边表中符合where子句的所有记录将会被返回。
+select e.empno,e.ename,d.dname from emp e right join dept1 d on e.deptno = d.deptno;
+-- 满外连接：将会返回所有表中符合where语句条件的所有记录。如果任一表的指定字段没有符合条件的值的话，那么就使用null值替代
+select e.empno,e.ename,d.dname from emp e full join dept1 d on e.deptno = d.deptno;
+-- 多表连接 注意：连接n个表，至少需要n-1个连接条件。例如：连接三个表，至少需要两个连接条件
+create table if not exists location(
+    loc int,
+    loc_name string
+)
+row format delimited fields terminated by '\t';
+load data local inpath '/opt/location.txt' into table location;
+-- 多表查询
+select e.empno,e.ename,d.dname from emp e  
+    join dept1 d 
+    on e.deptno = d.deptno
+    join location l
+    on d.loc = l.loc;
+-- 笛卡尔集
+select empno,dname from emp,dept;
+-- 联合查询
+-- union&union all上下拼接
+-- union和union all都是上下拼接sql的结果，这点是和join有区别的，join是左右关联，union和union all是上下拼接。union去重，union all不去重。
+-- union和union all在上下拼接sql结果时有两个要求：
+-- （1）两个sql的结果，列的个数必须相同
+-- （2）两个sql的结果，上下所对应列的类型必须一致
+select * from emp where deptno = 30 union select * from emp where deptno = 40;
+```
+#### 排序
+##### 全局排序order by
+```sql
+-- Order By：全局排序，只有一个Reduce
+-- asc(ascend):升序（默认）  desc(descend):降序
+select * from emp order by sal;
+select * from emp order by sal desc;
+```
+##### 每个Reduce内部排序（Sort By）
+```sql
+-- Sort By：对于大规模的数据集order by的效率非常低。在很多情况下，并不需要全局排序，此时可以使用Sort by。
+-- Sort by为每个reduce产生一个排序文件。每个Reduce内部进行排序，对全局结果集来说不是排序。
+-- 设置reduce个数
+set mapreduce.job.reduces=3;
+-- 查看设置reduce个数
+set mapreduce.job.reduces;
+-- 根据部门编号降序查看员工信息
+select
+    *
+from emp
+         sort by deptno desc;
+```
+##### 分区（Distribute By）
+Distribute By：在有些情况下，我们需要控制某个特定行应该到哪个Reducer，通常是为了进行后续的聚集操作。distribute by子句可以做这件事。distribute by类似MapReduce中partition（自定义分区），进行分区，结合sort by使用。
+对于distribute by进行测试，一定要分配多reduce进行处理，否则无法看到distribute by的效果。
+- distribute by的分区规则是根据分区字段的hash码与reduce的个数进行相除后，余数相同的分到一个区。
+- Hive要求distribute by语句要写在sort by语句之前。
+- 演示完以后mapreduce.job.reduces的值要设置回-1，否则下面分区or分桶表load跑MapReduce的时候会报错。
+##### 分区排序（Cluster By）
+- 当distribute by和sort by字段相同时，可以使用cluster by方式。
+- cluster by除了具有distribute by的功能外还兼具sort by的功能。但是排序只能是升序排序，不能指定排序规则为asc或者desc。
+
+### 函数
+```sql
+-- 查看系统内置函数
+show functions;
+-- 查看内置函数用法
+desc function upper;
+-- 查看内置函数详细信息
+desc function extended upper;
+```
+#### 单行函数
+##### 算数运算函数
+```sql
+-- 查询出所有员工的薪水后加1显示
+select sal + 1 from emp1;
+```
+##### 数值函数
+```sql
+-- round 四舍五入
+select round(3.3);
+-- ceil 向上取整
+select ceil(3.1);
+-- 向下取整
+select  floor(4.8);
+```
+##### 字符串函数
+- substring：截取字符串
+- 语法一：substring(string A, int start)
+- 返回值：string
+- 说明：返回字符串A从start位置到结尾的字符串
+- 语法二：substring(string A, int start, int len)
+- 返回值：string
+- 说明：返回字符串A从start位置开始，长度为len的字符串
+```sql
+-- 获取第二个字符以后的所有字符
+select substring("meicilly",2);
+-- 获取倒数第三个字符以后的所有字符
+select substring("meicilly",-3);
+-- 获取倒数第三个字符以后 向后获取2个字符
+select substring("meicilly",3,2);
+```
+- replace ：替换
+- 语法：replace(string A, string B, string C)
+- 返回值：string
+```sql
+select replace('meicilly','c','C');
+```
+- regexp_replace：正则替换
+- 语法：regexp_replace(string A, string B, string C)
+- 返回值：string
+- 说明：将字符串A中的符合java正则表达式B的部分替换为C。注意，在有些情况下要使用转义字符。
+```sql
+select regexp_replace('100-200', '(\\d+)', 'num');
+```
+- regexp：正则匹配
+- 语法：字符串 regexp 正则表达式
+- 返回值：boolean
+- 说明：若字符串符合正则表达式，则返回true，否则返回false。
+```sql
+select 'dfsaaaa' regexp 'dfsa+';
+```
+- repeat：重复字符串
+- 语法：repeat(string A, int n)
+- 返回值：string
+- 说明：将字符串A重复n遍。
+```sql
+select repeat('123',3);
+```
+- split ：字符串切割
+- 语法：split(string str, string pat)
+- 返回值：array
+- 说明：按照正则表达式pat匹配到的内容分割str，分割后的字符串，以数组的形式返回。
+```sql
+select split('a-b-c-d','-');
+```
+- nvl ：替换null值
+- 语法：nvl(A,B)
+- 说明：若A的值不为null，则返回A，否则返回B。
+```sql
+select nvl(null,1);
+```
+- concat ：拼接字符串
+- 语法：concat(string A, string B, string C, ……)
+- 返回：string
+- 说明：将A,B,C……等字符拼接为一个字符串
+```sql
+select concat('beijing','-','shanghai','-','shenzhen');
+```
+- concat_ws：以指定分隔符拼接字符串或者字符串数组
+- 语法：concat_ws(string A, string…| array(string))
+- 返回值：string
+- 说明：使用分隔符A拼接多个字符串，或者一个数组的所有元素。
+```sql
+select concat_ws('-','beijing','shanghai','shenzhen');
+select concat_ws('-',array('beijing','shenzhen','shanghai'));
+```
+- get_json_object：解析json字符串
+- 语法：get_json_object(string json_string, string path)
+- 返回值：string
+- 说明：解析json的字符串json_string，返回path指定的内容。如果输入的json字符串无效，那么返回NULL。
+```sql
+select get_json_object('[{"name":"大海海","sex":"男","age":"25"},{"name":"小宋宋","sex":"男","age":"47"}]','$.[0].name');
+```
+##### 日期函数
+- unix_timestamp：返回当前或指定时间的时间戳
+- 语法：unix_timestamp()
+- 返回值：bigint 
+```sql
+select unix_timestamp('2022/08/08 08-08-08','yyyy/MM/dd HH-mm-ss'); 
+```
+- from_unixtime：转化UNIX时间戳（从 1970-01-01 00:00:00 UTC 到指定时间的秒数）到当前时区的时间格式
+- 语法：from_unixtime(bigint unixtime[, string format])
+- 返回值：string 
+```sql
+select from_unixtime(1659946088); 
+-- current_date 当前日期
+select current_date;
+-- 当前的时期加时间 并且精确的毫秒
+select current_timestamp;  
+```
+- month：获取日期中的月
+- 语法：month (string date)
+- 返回值：int 
+```sql
+select month('2022-08-08 08:08:08');
+```
+- day：获取日期中的日
+- 语法：day (string date)
+- 返回值：int 
+```sql
+select day('2022-08-08 08:08:08');
+```
+- hour：获取日期中的小时
+- 语法：hour (string date)
+- 返回值：int 
+```sql
+select hour('2022-08-08 08:08:08'); 
+```
+- datediff：两个日期相差的天数（结束日期减去开始日期的天数）
+- 语法：datediff(string enddate, string startdate)
+- 返回值：int 
+```sql
+select datediff('2021-08-08','2022-10-09');
+```
+- date_add：日期加天数
+- 语法：date_add(string startdate, int days)
+- 返回值：string
+- 说明：返回开始日期 startdate 增加 days 天后的日期
+```sql
+select date_add('2022-08-08',2);
+```
+- date_sub：日期减天数
+- 语法：date_sub (string startdate, int days)
+- 返回值：string
+- 说明：返回开始日期startdate减少days天后的日期。
+```sql
+select date_sub('2022-08-08',2);
+```
+- date_format:将标准日期解析成指定格式字符串
+```sql
+select date_format('2022-08-08','yyyy年-MM月-dd日');
+```
+##### 流程控制函数
+- case when：条件判断函数
+- 语法一：case when a then b [when c then d]* [else e] end
+- 返回值：T
+- 说明：如果a为true，则返回b；如果c为true，则返回d；否则返回 e
+```sql
+select case when 1=2 then 'tom' when 2=2 then 'mary' else 'tim' end from tabl eName; 
+```
+- if: 条件判断，类似于Java中三元运算符
+- 语法：if（boolean testCondition, T valueTrue, T valueFalseOrNull）
+- 返回值：T
+- 说明：当条件testCondition为true时，返回valueTrue；否则返回valueFalseOrNull
+```sql
+select if(10 > 5,'正确','错误'); 
+select if(10 < 5,'正确','错误');
+```
+- if: 条件判断，类似于Java中三元运算符
+- 语法：if（boolean testCondition, T valueTrue, T valueFalseOrNull）
+- 返回值：T
+- 说明：当条件testCondition为true时，返回valueTrue；否则返回valueFalseOrNull
+```sql
+-- 满足条件正确
+select if(10 > 5,'正确','错误');
+```
+##### 集合函数
+- size 集合中元素的个数
+```sql
+select size(friends) from test;
+```
+- map：创建map集合
+- 语法：map (key1, value1, key2, value2, …)
+- 说明：根据输入的key和value对构建map类型
+```sql
+select map('meicilly',1,'heihei',2);
+-- map_keys 返回map中的key
+select map_keys(map('meicilly',1,'heihei',2));
+-- map_values 返回map中的value
+select map_values(map('meicilly',1,'heihei',2));
+```
+- array 声明array集合
+- 语法：array(val1, val2, …)
+- 说明：根据输入的参数构建数组array类
+```sql
+select array('1','2','3','4');
+-- array_contains 判断array中是否包含某个元素
+select array_contains(array('a','b','c','d'),'a');
+-- 将array中的元素排序
+select sort_array(array('a','d','c'));
+```
+- struct声明struct中的各属性
+- 语法：struct(val1, val2, val3, …)
+- 说明：根据输入的参数构建结构体struct类
+```sql
+select struct('name','age','weight');
+-- named_struct声明struct的属性和值
+select named_struct('name','xiaosong','age',18,'weight',80);
+```
+### 高级聚合函数
+```sql
+-- collect_list收集并形成list集合 结果不去重
+select
+    sex,
+    collect_list(job)
+from
+    emp
+group by
+    sex;
+-- collect_set收集并形成set集合 结果去重
+select
+    sex,
+    collect_set(job)
+from
+    employee
+group by
+    sex
+```
+### 分区表和分通表
+#### 分区表
+Hive中的分区就是把一张大表的数据按照业务需要分散的存储到多个目录，每个目录就称为该表的一个分区。在查询时通过where子句中的表达式选择查询所需要的分区，这样的查询效率会提高很多。
+##### 创建分区表
+```sql
+-- 创建分区表
+create table dept_partition
+(
+    deptno int,
+    dname  string,
+    loc    string
+)
+partitioned by (day string)
+row format delimited fields terminated by '\t';
+-- 写数据
+load data local inpath '/opt/dept_20220401.log' into table dept_partition partition(day='20220401');
+-- 将day='20220401'分区的数据插入到day='20220402'分区
+insert overwrite table dept_partition partition (day = '20220402')
+select deptno, dname, loc
+from dept_partition
+where day = '20220401';
+-- 查看所有分区信息
+show partitions dept_partition;
+-- 增加分区
+-- 创建单个分区
+alter table dept_partition 
+add partition(day='20220404');
+-- 创建多个分区 中加不能有逗号
+alter table dept_partition
+add partition(day='20220404') partiton(day='20220405');
+-- 删除分区
+alter table dept_partition
+drop partition(day='20220404');
+-- 删除多个分区 中间必须有逗号
+alter table dept_partition
+drop partition(day='20220404'), partition(day='20220405');
+```
+##### 二级分区
+```sql
+create table dept_partition2(
+    deptno int,
+    dname string,
+    loc string
+)
+partitioned by (day string,hour string)
+row format delimited fields terminated by '\t';
+
+load data local inpath '/opt/module/hive/datas/dept_20220401.log' 
+into table dept_partition2 
+partition(day='20220401', hour='12');
+
+
+select
+    *
+from dept_partition2
+where day='20220401' and hour='12';
+```
+##### 动态分区

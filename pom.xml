@@ -21,6 +21,7 @@
         <module>springmvc</module>
         <module>mapreduce</module>
         <module>hive</module>
+        <module>hbase</module>
     </modules>
 
     <properties>
