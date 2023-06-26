@@ -17,6 +17,7 @@
         <module name="suanfa" />
         <module name="mapreduce" />
         <module name="kafka" />
+        <module name="Design_pattern" />
         <module name="springmvc" />
         <module name="hbase" />
         <module name="netty" />

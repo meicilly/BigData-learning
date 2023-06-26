@@ -22,6 +22,7 @@
         <module>mapreduce</module>
         <module>hive</module>
         <module>hbase</module>
+        <module>Design_pattern</module>
     </modules>
 
     <properties>
