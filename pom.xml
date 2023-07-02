@@ -23,6 +23,10 @@
         <module>hive</module>
         <module>hbase</module>
         <module>Design_pattern</module>
+        <module>springboot</module>
+        <module>springboot/springboot_01_quickstart</module>
+        <module>springboot/springboot_02_read_data</module>
+        <module>zookeeper</module>
     </modules>
 
     <properties>

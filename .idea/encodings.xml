@@ -33,6 +33,12 @@
     <file url="file://$PROJECT_DIR$/spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring_MVC/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring_MVC/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot/springboot_01_quickstart/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot/springboot_01_quickstart/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot/springboot_02_read_data/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot/springboot_02_read_data/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/springmvc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/springmvc/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
@@ -41,5 +47,7 @@
     <file url="file://$PROJECT_DIR$/toocat/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/untitled/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/untitled/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper/src/main/resources" charset="UTF-8" />
   </component>
 </project>
