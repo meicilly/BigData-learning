@@ -1,15 +1,15 @@
 package com.meicilly;
 
 import org.apache.zookeeper.*;
-import org.apache.zookeeper.data.Stat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class ZkSet {
+public class GetChild {
     private static String ZK_URL = "192.168.233.16:2181,192.168.233.17:2181,192.168.233.18:2181";
     ZooKeeper zooKeeper;
     @Before
@@ -33,28 +33,30 @@ public class ZkSet {
     }
 
     @Test
-    public void set1() throws InterruptedException, KeeperException {
-        // TODO: 2023/7/3 节点的路径
-        // TODO: 2023/7/3 修改的数据
-        // TODO: 2023/7/3 数据版本号 -1代表版本号不参与更新
-        Stat stat = zooKeeper.setData("/set/node1", "node13".getBytes(), -1);
-        // TODO: 2023/7/3 获取当前版本
-        System.out.println(stat.getVersion());
+    public void get1() throws InterruptedException, KeeperException {
+        // TODO: 2023/7/3 节点路径
+        List<String> lists = zooKeeper.getChildren("/create", false);
+        for (String list: lists) {
+            System.out.println(list);
+        }
     }
 
     @Test
-    public void set2() throws InterruptedException {
-        zooKeeper.setData("/set/node1", "node14".getBytes(), -1, new AsyncCallback.StatCallback() {
+    public void get2() throws Exception {
+        // 异步用法
+        zooKeeper.getChildren("/get", false, new AsyncCallback.ChildrenCallback() {
             @Override
-            public void processResult(int rc, String path, Object ctx, Stat stat) {
-                // 0代表修改成功
+            public void processResult(int rc, String path, Object ctx, List<String> children) {
+                // 0代表读取成功
                 System.out.println(rc);
                 // 节点的路径
                 System.out.println(path);
                 // 上下文参数对象
                 System.out.println(ctx);
-                // 属性描述对象
-                System.out.println(stat.getVersion());
+                // 子节点信息
+                for (String str : children) {
+                    System.out.println(str);
+                }
             }
         },"I am Context");
         Thread.sleep(10000);

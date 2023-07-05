@@ -9,7 +9,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-public class ZkSet {
+public class ZKGet {
     private static String ZK_URL = "192.168.233.16:2181,192.168.233.17:2181,192.168.233.18:2181";
     ZooKeeper zooKeeper;
     @Before
@@ -33,27 +33,30 @@ public class ZkSet {
     }
 
     @Test
-    public void set1() throws InterruptedException, KeeperException {
-        // TODO: 2023/7/3 节点的路径
-        // TODO: 2023/7/3 修改的数据
-        // TODO: 2023/7/3 数据版本号 -1代表版本号不参与更新
-        Stat stat = zooKeeper.setData("/set/node1", "node13".getBytes(), -1);
-        // TODO: 2023/7/3 获取当前版本
+    public void get1() throws InterruptedException, KeeperException {
+        // TODO: 2023/7/3 节点路径
+        // TODO: 2023/7/3 读取节点属性的对象
+        Stat stat = new Stat();
+        byte[] data = zooKeeper.getData("/create/node1", false, stat);
+        System.out.println(new String(data));
         System.out.println(stat.getVersion());
     }
 
     @Test
-    public void set2() throws InterruptedException {
-        zooKeeper.setData("/set/node1", "node14".getBytes(), -1, new AsyncCallback.StatCallback() {
+    public void get2() throws Exception {
+        //异步方式
+        zooKeeper.getData("/get/node1", false, new AsyncCallback.DataCallback() {
             @Override
-            public void processResult(int rc, String path, Object ctx, Stat stat) {
-                // 0代表修改成功
+            public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
+                // 0代表读取成功
                 System.out.println(rc);
                 // 节点的路径
                 System.out.println(path);
                 // 上下文参数对象
                 System.out.println(ctx);
-                // 属性描述对象
+                // 数据
+                System.out.println(new String(data));
+                // 属性对象
                 System.out.println(stat.getVersion());
             }
         },"I am Context");

@@ -1,6 +1,9 @@
 package com.meicilly;
 
-import org.apache.zookeeper.*;
+import org.apache.zookeeper.AsyncCallback;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.junit.After;
 import org.junit.Before;
@@ -9,7 +12,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-public class ZkSet {
+public class ZKExists {
     private static String ZK_URL = "192.168.233.16:2181,192.168.233.17:2181,192.168.233.18:2181";
     ZooKeeper zooKeeper;
     @Before
@@ -33,27 +36,26 @@ public class ZkSet {
     }
 
     @Test
-    public void set1() throws InterruptedException, KeeperException {
-        // TODO: 2023/7/3 节点的路径
-        // TODO: 2023/7/3 修改的数据
-        // TODO: 2023/7/3 数据版本号 -1代表版本号不参与更新
-        Stat stat = zooKeeper.setData("/set/node1", "node13".getBytes(), -1);
-        // TODO: 2023/7/3 获取当前版本
+    public void exists1() throws Exception {
+        // arg1:节点的路径
+        Stat stat=zooKeeper.exists("/exists1",false);
+        // 节点的版本信息
         System.out.println(stat.getVersion());
     }
 
     @Test
-    public void set2() throws InterruptedException {
-        zooKeeper.setData("/set/node1", "node14".getBytes(), -1, new AsyncCallback.StatCallback() {
+    public void exists2() throws Exception {
+        // 异步方式
+        zooKeeper.exists("/exists1", false, new AsyncCallback.StatCallback() {
             @Override
             public void processResult(int rc, String path, Object ctx, Stat stat) {
-                // 0代表修改成功
+                // 0 代表方式执行成功
                 System.out.println(rc);
                 // 节点的路径
                 System.out.println(path);
-                // 上下文参数对象
+                // 上下文参数
                 System.out.println(ctx);
-                // 属性描述对象
+                // 节点的版本信息
                 System.out.println(stat.getVersion());
             }
         },"I am Context");
