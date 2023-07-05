@@ -7,3 +7,5 @@
 6. dn1,dn2,dn3逐级但应客户。
 7. 客户端开始往dn1上传第一个block(先从磁盘读取数据放到一个本地内存缓存)，以packet为单位，dn1收到一个packet就会传给dn2,dn2传给dn3;dn1每传一个packet会放入一个应答队列等待应答。
 8. 当一个block传输完成之后，客户端再次请求NameNode上传第二个block的服务器。（重复执行3-7步）。
+![hdfs写数据流程图](./img/01_HDFS写数据过程.png)
+### HDFS读数据流程
