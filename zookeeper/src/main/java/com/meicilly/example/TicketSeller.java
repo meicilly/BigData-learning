@@ -1,4 +1,4 @@
-package com.itcast.example;
+package com.meicilly.example;
 
 public class TicketSeller {
 

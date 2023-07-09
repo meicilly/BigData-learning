@@ -1,12 +1,13 @@
-package com.itcast.example;
+package com.meicilly.example;
 
-import java.util.concurrent.CountDownLatch;
 
-import com.itcast.watcher.ZKConnectionWatcher;
+import com.meicilly.watcher.ZKConnectionWatcher;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.ZooKeeper;
+
+import java.util.concurrent.CountDownLatch;
 
 public class MyConfigCenter implements Watcher {
 
@@ -26,7 +27,7 @@ public class MyConfigCenter implements Watcher {
     public void process(WatchedEvent event) {
         try {
             // 捕获事件状态
-            if (event.getType() == Event.EventType.None) {
+            if (event.getType() == EventType.None) {
                 if (event.getState() == Event.KeeperState.SyncConnected) {
                     System.out.println("连接成功");
                     countDownLatch.countDown();

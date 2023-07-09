@@ -1,9 +1,7 @@
 package com.meicilly.example;
 
 import com.meicilly.watcher.ZKConnectionWatcher;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -47,5 +45,24 @@ public class GloballyUniqueId implements Watcher {
             e.printStackTrace();
         }
 
+    }
+    // TODO: 2023/7/7 生成id的方法
+    public String getUniqueId(){
+        String path = "";
+        try {
+            // TODO: 2023/7/7 创建临时有序的节点
+            path = zooKeeper.create(defaultPath,new byte[0], ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return path.substring(9);
+    }
+
+    public static void main(String[] args) throws IOException {
+        GloballyUniqueId globallyUniqueId = new GloballyUniqueId();
+        for (int i = 1; i <= 5; i++) {
+            String id = globallyUniqueId.getUniqueId();
+            System.out.println(id);
+        }
     }
 }

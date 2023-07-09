@@ -1,4 +1,4 @@
-package com.mj;
+package base.动态数组;
 
 public class Person {
 	private int age;

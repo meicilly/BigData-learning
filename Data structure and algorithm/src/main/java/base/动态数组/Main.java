@@ -1,4 +1,4 @@
-package com.mj;
+package base.动态数组;
 
 
 public class Main {
@@ -9,7 +9,7 @@ public class Main {
 		list.add(new Person(10, "Jack"));
 		list.add(22);
 		
-		list.indexOf(new Person(10, "Jack"));
+		//((ArrayList<Object>) list).indexOf(new Person(10, "Jack"));
 		
 		
 //		ArrayList<Object> persons  = new ArrayList<>();

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class GetChild {
-    private static String ZK_URL = "192.168.233.16:2181,192.168.233.17:2181,192.168.233.18:2181";
+    private static final String ZK_URL = "192.168.233.16:2181,192.168.233.17:2181,192.168.233.18:2181";
     ZooKeeper zooKeeper;
     @Before
     public void before() throws IOException, InterruptedException {
