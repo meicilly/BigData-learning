@@ -5,7 +5,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 object Spark01_RDD_makeRDD {
   def main(args: Array[String]): Unit = {
-    val conf: SparkConf = new SparkConf().setMaster("local").setAppName("wordcount")
+    val conf: SparkConf = new SparkConf().setMaster("local").setAppName("makeRDD")
     val sc: SparkContext = new SparkContext(conf)
     val rdd: RDD[Int] = sc.makeRDD(List(1, 2, 3, 4))
     // TODO - 行动算子
