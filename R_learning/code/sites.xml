@@ -1,0 +1,22 @@
+<sites>
+    <site>
+        <id>1</id>
+        <name>Google</name>
+        <url>www.google.com</url>
+        <likes>111</likes>
+    </site>
+ 
+    <site>
+        <id>2</id>
+        <name>Runoob</name>
+        <url>www.runoob.com</url>
+        <likes>222</likes>
+    </site>
+ 
+    <site>
+        <id>3</id>
+        <name>Taobao</name>
+        <url>www.taobao.com</url>
+        <likes>333</likes>
+    </site>
+</sites>
